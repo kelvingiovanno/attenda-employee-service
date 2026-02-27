@@ -4,7 +4,7 @@ import {
     EmployeeCreateInput,
     EmployeeUpdateInput,
 } from 'generated/prisma/models';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EmployeeService {
