@@ -1,46 +1,41 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    ParseUUIDPipe,
-    Patch,
-    Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/createEmployee.dto';
-import { UpdateEmployeeDto } from './dto/updateEmployee.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+    CreateEmployeeDto,
+    GetAllEmployeeDto,
+    UpdateEmployeeDto,
+} from './employee.dto';
 
-@Controller('/employees')
+@Controller()
 export class EmployeeController {
     constructor(private readonly employeeService: EmployeeService) {}
 
-    @Get()
-    async getEmployee() {
-        return this.employeeService.getAllEmployee();
+    @MessagePattern('get_employees')
+    async getAllEmployees(@Payload() dto: GetAllEmployeeDto) {
+        return this.employeeService.getAllEmployee(dto);
     }
 
-    @Get('/:id')
-    async getEmployeeById(@Param('id', new ParseUUIDPipe()) id: string) {
+    @MessagePattern('get_employee_by_id')
+    async getEmployeeById(@Payload('id') id: string) {
         return this.employeeService.getEmployeeById(id);
     }
 
-    @Post()
-    async createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
-        return this.employeeService.createEmployee(createEmployeeDto);
+    @MessagePattern('create_employee')
+    async createEmployee(@Payload('data') dto: CreateEmployeeDto) {
+        return this.employeeService.createEmployee(dto);
     }
 
-    @Patch('/:id')
+    @MessagePattern('update_employee')
     async updateEmployee(
-        @Param('id', new ParseUUIDPipe()) id: string,
-        @Body() updateEmployeeDto: UpdateEmployeeDto,
+        @Payload('id') id: string,
+        @Payload('data') dto: UpdateEmployeeDto,
     ) {
-        return this.employeeService.updateEmployee(id, updateEmployeeDto);
+        return this.employeeService.updateEmployee(id, dto);
     }
 
-    @Delete('/:id')
-    async deleteEmployee(@Param('id', new ParseUUIDPipe()) id: string) {
+    @MessagePattern('delete_employee')
+    async deleteEmployee(@Payload('id') id: string) {
         return this.employeeService.deleteEmployee(id);
     }
 }
